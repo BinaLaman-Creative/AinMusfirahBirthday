@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday Ain Musfirah</title>
+    <!-- Tailwind CSS for modern layouts -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- FontAwesome for elegant icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti for the grand finale -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        :root {
+            --color-pink: #fbcfe8;
+            --color-cream: #fffbeb;
+            --color-gold: #d4af37;
+        }
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #fff5f5 0%, #fffbeb 50%, #fce7f3 100%);
+            overflow-x: hidden;
+        }
+        .serif-title {
+            font-family: 'Cormorant Garamond', serif;
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.45);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+        }
+        /* Custom floating animation */
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); opacity: 0.2; }
+            50% { transform: translateY(-60px) rotate(10deg); opacity: 0.6; }
+            100% { transform: translateY(-120px) rotate(0deg); opacity: 0; }
+        }
+        .particle {
+            position: absolute;
+            pointer-events: none;
+            animation: float 8s infinite linear;
+        }
+        /* Reveal active state animation */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 1.2s ease-out;
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        /* Pulse Heart */
+        @keyframes heartPulse {
+            0% { transform: scale(1); filter: drop-shadow(0 0 2px rgba(212,175,55,0.4)); }
+            50% { transform: scale(1.15); filter: drop-shadow(0 0 15px rgba(219,39,119,0.6)); }
+            100% { transform: scale(1); filter: drop-shadow(0 0 2px rgba(212,175,55,0.4)); }
+        }
+        .pulsing-heart {
+            animation: heartPulse 2s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="text-neutral-800">
+
+    <!-- ==========================================
+         PASSWORD GATE SCREEN
+         ========================================== -->
+    <div id="password-gate" class="fixed inset-0 z-50 flex flex-col items-center justify-center p-4 transition-all duration-1000 bg-gradient-to-tr from-pink-100 via-amber-50 to-rose-100">
+        <!-- Floating shapes background inside gate -->
+        <div class="absolute inset-0 overflow-hidden opacity-40 pointer-events-none">
+            <div class="absolute top-1/4 left-10 w-24 h-24 rounded-full bg-pink-200 blur-xl"></div>
+            <div class="absolute bottom-1/4 right-10 w-36 h-36 rounded-full bg-amber-200 blur-xl"></div>
+        </div>
+
+        <div class="glass max-w-md w-full rounded-3xl p-8 text-center shadow-2xl border border-white/60 relative z-10">
+            <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner text-pink-400">
+                <i class="fa-solid fa-lock text-2xl"></i>
+            </div>
+            <h1 class="serif-title text-3xl font-bold text-neutral-800 tracking-wide mb-2">A Special Birthday Surprise</h1>
+            <p class="text-sm text-neutral-500 mb-8 leading-relaxed">This website is made with love, especially for someone who means so much to me.</p>
+            
+            <div class="space-y-4">
+                <div class="relative">
+                    <input type="password" id="password-input" placeholder="Enter Secret Password" 
+                           class="w-full px-5 py-3.5 rounded-xl bg-white/80 border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-pink-300 text-center tracking-widest font-medium transition-all shadow-sm">
+                </div>
+                <button onclick="unlockWebsite()" 
+                        class="w-full py-3.5 bg-gradient-to-r from-rose-400 to-pink-500 text-white rounded-xl font-medium tracking-wider shadow-lg shadow-pink-200 hover:shadow-xl hover:opacity-95 transition-all cursor-pointer">
+                    UNLOCK SURPRISE <i class="fa-solid fa-heart ml-2"></i>
+                </button>
+                <p id="error-msg" class="text-xs text-red-400 font-medium hidden mt-2">✨ Oops! That's not the magic key. Try again! ✨</p>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ==========================================
+         MAIN WEBSITE CONTENT
+         ========================================== -->
+    <div id="main-content" class="hidden opacity-0 transition-opacity duration-1000 relative">
+
+        <!-- FLOATING MUSIC PLAYER -->
+        <div class="fixed bottom-6 right-6 z-40 glass p-3 rounded-full shadow-xl flex items-center gap-3 border border-white/80">
+            <button id="music-toggle" onclick="toggleMusic()" class="w-10 h-10 rounded-full bg-gradient-to-r from-rose-400 to-pink-400 text-white flex items-center justify-center shadow-md focus:outline-none cursor-pointer">
+                <i id="music-icon" class="fa-solid fa-pause"></i>
+            </button>
+            <div class="hidden md:flex flex-col pr-3">
+                <span class="text-xs font-semibold text-neutral-700">Lagu special untuk Sayang</span>
+                <input type="range" id="volume-control" min="0" max="1" step="0.1" value="0.5" oninput="changeVolume(this.value)" class="w-20 h-1 accent-pink-500 rounded-lg cursor-pointer">
+            </div>
+        </div>
+        <!-- Hidden Audio Element - Replace with your own audio track path -->
+        <audio id="birthday-audio" loop src="lagu birthday kak leli.mp3"></audio>
+
+
+        <!-- HERO SECTION -->
+        <section class="min-h-screen relative flex flex-col justify-center items-center text-center p-6 overflow-hidden">
+            <!-- Particle Generator Canvas Container -->
+            <div id="particle-container" class="absolute inset-0 pointer-events-none z-0"></div>
+            
+            <div class="max-w-4xl relative z-10 space-y-6">
+                <span class="text-xs uppercase tracking-[0.3em] font-medium text-amber-600/80 bg-amber-50 px-4 py-1.5 rounded-full border border-amber-200/50">To My Little Princess</span>
+                <h1 class="serif-title text-4xl sm:text-6xl md:text-7xl font-bold text-neutral-800 tracking-wide leading-tight">
+                    Happy Birthday,<br><span class="text-transparent bg-clip-text bg-gradient-to-r from-rose-500 via-pink-500 to-amber-500">Sayang</span>
+                </h1>
+                <p class="text-base sm:text-xl text-neutral-600 max-w-2xl mx-auto font-light leading-relaxed px-4">
+                    "if i could choose someone to love over and over again, i’d choose you every single time, you make my world a little brighter, my days a little better and my heart a little fuller. it will always be you, sayang."
+                </p>
+                <div class="pt-8">
+                    <i class="fa-solid fa-chevron-down text-neutral-400 text-xl animate-bounce"></i>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- SECTION 1: WELCOME MESSAGE -->
+        <section class="max-w-4xl mx-auto px-6 py-20 reveal">
+            <div class="glass rounded-3xl p-8 md:p-16 shadow-xl relative border border-white">
+                <div class="absolute -top-6 left-1/2 transform -translate-x-1/2 w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center text-amber-600 shadow-md">
+                    <i class="fa-solid fa-envelope-open-text text-lg"></i>
+                </div>
+                <h2 class="serif-title text-3xl md:text-4xl text-center font-bold mb-10 text-neutral-800">My Letter of Gratitude</h2>
+                
+                <div class="serif-title text-lg md:text-xl text-neutral-700 space-y-6 leading-relaxed font-light tracking-wide italic">
+                    <p>Sayang,</p>
+                    <p>i just want you to know how grateful i am to have you in my life, sometimes, i may not be the best at expressing my feelings, and sometimes i might make mistakes that hurt you, but please never doubt how much you mean to me. you are someone so special to my heart, and having you in my life is one of the things i'll always be thankful for.</p>
+                    <p>on your birthday, i wish i could take away all your sadness, heal every pain you've been hiding, and give you all the happiness you deserve. i know life isn't always easy, and i know there are times when you feel tired of everything, but i hope you never forget that you don't have to face everything alone. you have me, sayang. you can always come to me when the world feels too heavy.</p>
+                    <p>i'm sorry for the times i haven't made you feel as loved and appreciated as you deserve. i'm still learning how to love you better, but i promise i'll keep trying. you deserve a love that makes you feel safe, a love that understands you, and a love that never makes you question your worth. i hope i can be that kind of love for you.</p>
+                    <p>thank you for existing, for being yourself, and for coming into my life. if i could wish for one thing today, it would be for you to be genuinely happy, to achieve everything you've ever dreamed of, and to never feel like you're not enough. because to me, you are more precious than you realise.</p>
+                    <p>happy birthday sayang, i hope i get to celebrate many more birthdays with you, create more beautiful memories together, and watch you grow into the person you've always wanted to be. no matter how difficult life gets, i hope you always remember that you are loved, appreciated, and someone i'll always be grateful for. if i had to choose again, i'd still choose you, over and over again. i love you so much, sayang. 🤍🫶🏻</p>
+                    <p class="text-right pt-4 font-semibold text-rose-500 not-italic">and if one day you ever forget how much you mean to me, i hope my love will be enough to remind you that you were always someone worth loving, even on the days you couldn't love yourself.-HanifHisyam🤍</p>
+                </div>
+            </div>
+        </section>
+
+
+        
+
+
+        <!-- SECTION 2: MEMORY GALLERY -->
+        <section class="max-w-6xl mx-auto px-6 py-20 reveal">
+            <div class="text-center mb-12">
+                <h2 class="serif-title text-3xl md:text-4xl font-bold mb-3 text-neutral-800">Enjoy your special day sayang</h2>
+            </div>
+            
+            <!-- Masonry Grid (Flex/Columns for clean display layout) -->
+            <div class="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6">
+                <!-- Image 1 -->
+                <div class="break-inside-avoid overflow-hidden rounded-2xl glass p-2 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer group" onclick="openLightbox(this.querySelector('img').src)">
+                    <img src="mus 1.jpg" alt="Memory" class="w-full h-auto rounded-xl object-cover group-hover:scale-[1.01] transition-transform duration-500">
+                    <p class="text-xs text-neutral-500 italic mt-3 px-2 text-center">Sayang punya comel tu kekal sampai sekarang.</p>
+                </div>
+                <!-- Image 2 -->
+                <div class="break-inside-avoid overflow-hidden rounded-2xl glass p-2 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer group" onclick="openLightbox(this.querySelector('img').src)">
+                    <img src="mus 2.jpg" alt="Memory" class="w-full h-auto rounded-xl object-cover group-hover:scale-[1.01] transition-transform duration-500">
+                    <p class="text-xs text-neutral-500 italic mt-3 px-2 text-center">Sunflower tu jadi cantik sebab ada sayang</p>
+                </div>
+                <!-- Image 3 -->
+                <div class="break-inside-avoid overflow-hidden rounded-2xl glass p-2 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer group" onclick="openLightbox(this.querySelector('img').src)">
+                    <img src="mus 3.jpg" alt="Memory" class="w-full h-auto rounded-xl object-cover group-hover:scale-[1.01] transition-transform duration-500">
+                    <p class="text-xs text-neutral-500 italic mt-3 px-2 text-center">Btw ni first bunga yang saya bagi dekat sayang, if life allows me one little wish, it’s to keep finding reasons to bring flowers to the girl who means the world to me</p>
+                </div>
+                <!-- Image 4 -->
+                <div class="break-inside-avoid overflow-hidden rounded-2xl glass p-2 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer group" onclick="openLightbox(this.querySelector('img').src)">
+                    <img src="mus 4.jpg" alt="Memory" class="w-full h-auto rounded-xl object-cover group-hover:scale-[1.01] transition-transform duration-500">
+                    <p class="text-xs text-neutral-500 italic mt-3 px-2 text-center">Saya letak ni sebab haritu sayang post ni dan cakap sayang lawa tapi memang tu la truth nya yang sayang memangg cantikk dann selalu jadi yang paling cantik di mata saya</p>
+                </div>
+                
+<!-- Image 5: Flowers for You -->
+<div class="break-inside-avoid overflow-hidden rounded-2xl glass p-2 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer group mb-6"
+     onclick="openLightbox(this.querySelector('img').src)">
+    <img src="mus 5.jpg" alt="Flowers for you"
+         class="w-full h-auto rounded-xl object-cover group-hover:scale-[1.01] transition-transform duration-500">
+    <p class="text-xs text-neutral-500 italic mt-3 px-2 pb-2 text-center leading-relaxed">
+        Kalau haritu saya tak berani nak ambil gambar dengan sayang, mungkin kita tak akan jadi macam ssekarang kan, and for that saya rasa besyukur sangat sebab saya rasa action saya waktu tu tak sia sia, thanks sayang for choosing me 🤍
+    </p>
+</div>
+
+<!-- Image 6: Our Little Memories -->
+<div class="break-inside-avoid overflow-hidden rounded-2xl glass p-2 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer group mb-6"
+     onclick="openLightbox(this.querySelector('img').src)">
+    <img src="mus 6.jpg" alt="Our little memories"
+         class="w-full h-auto rounded-xl object-cover group-hover:scale-[1.01] transition-transform duration-500">
+    <p class="text-xs text-neutral-500 italic mt-3 px-2 pb-2 text-center leading-relaxed">
+        i’ll spend my days doing everything i can to keep that little smile on your face alive, and for as long as life allows me, i’ll keep trying to be the reason behind your happiness, even on the days when the world gives you a thousand reasons to cry. because seeing you happy will always be one of my favourite things in this life, and loving you means wanting your heart to feel at home, forever, sayang 🤍
+    </p>
+</div>
+
+
+            </div>
+        </section>
+
+
+       
+        <!-- SECTION 7: FINAL APPRECIATION (GRAND FINALE) -->
+        <section id="final-appreciation" class="min-h-screen flex flex-col justify-center items-center text-center p-6 relative overflow-hidden bg-gradient-to-b from-transparent to-pink-100/50">
+            <div class="max-w-3xl relative z-10 space-y-8 px-4">
+                <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto shadow-md pulsing-heart">
+                    <i class="fa-solid fa-heart text-4xl text-rose-500"></i>
+                </div>
+                <h2 class="serif-title text-3xl sm:text-5xl font-bold text-neutral-800 leading-snug">
+                    no matter where life takes us, i hope a part of me will always be beside you, reminding you that you are loved more than words could ever explain. if life ever gets difficult, i hope you remember that i'll always be grateful for the chance to love you. all i ever want is to see that beautiful smile of yours stay a little longer, to be one of the reasons your heart feels happy, and to keep giving you the kind of love you have always deserved. and if i could turn back time and choose all over again, i'd still choose you, in every lifetime, in every version of this world. happy birthday sayang, you will always be one of the most beautiful parts of my life, and no matter what tomorrow brings, a part of my heart will always belong to you, I loveyou in every universe sayang🤍
+                </h2>
+                <p class="serif-title text-2xl md:text-3xl font-semibold text-amber-600/90 tracking-wide">
+                    Once again, Happy Birthday sayang and may all your dreams come true.
+                </p>
+                <
+<a href="https://drive.google.com/file/d/1J_D6d9d_p9voYG9GxHyQ2-tRYugIiD1v/view?usp=drivesdk"
+   target="_blank"
+   rel="noopener noreferrer"
+   class="inline-block px-8 py-3 bg-white text-rose-500 font-semibold text-sm tracking-wider rounded-full shadow-md hover:shadow-lg transition-all border border-rose-200 cursor-pointer">
+    TEKAN NI SAYANG 🤍
+</a>
+
+                </button>
+            </div>
+        </section>
+
+    </div>
+
+
+    <!-- LIGHTBOX PREVIEW ELEMENT -->
+    <div id="lightbox" class="fixed inset-0 z-50 bg-black/90 hidden items-center justify-center p-4 transition-all duration-300 opacity-0" onclick="closeLightbox()">
+        <button class="absolute top-6 right-6 text-white text-3xl opacity-70 hover:opacity-100"><i class="fa-solid fa-xmark"></i></button>
+        <img id="lightbox-img" src="" alt="Expanded Preview" class="max-w-full max-h-[85vh] rounded-lg shadow-2xl object-contain transform scale-95 transition-transform duration-300">
+    </div>
+
+
+    <!-- ==========================================
+         JAVASCRIPT LOGIC
+         ========================================== -->
+    <script>
+        // CONFIGURATION: Set your custom password here
+        const CONFIG_PASSWORD = "ainmus";
+
+        // CONFIGURATION: Set her upcoming birthday countdown date here
+        const COUNTDOWN_DATE = new Date("Dec 31, 2026 00:00:00").getTime();
+
+        // 1. Password Protection Logic
+        function unlockWebsite() {
+            const enteredPassword = document.getElementById('password-input').value;
+            const gate = document.getElementById('password-gate');
+            const mainContent = document.getElementById('main-content');
+            const errorMsg = document.getElementById('error-msg');
+            const audio = document.getElementById('birthday-audio');
+
+            if(enteredPassword === CONFIG_PASSWORD) {
+                // Smooth hide lock screen
+                gate.classList.add('opacity-0', 'scale-95');
+                setTimeout(() => {
+                    gate.classList.add('hidden');
+                    mainContent.classList.remove('hidden');
+                    // Fade in content
+                    setTimeout(() => {
+                        mainContent.classList.remove('opacity-0');
+                        initWebsiteEffects();
+                    }, 50);
+                }, 1000);
+
+                // Autoplay background track elegantly
+                audio.play().catch(e => console.log("Autoplay music blocked by browser policies. Waiting for interaction."));
+            } else {
+                errorMsg.classList.remove('hidden');
+                document.getElementById('password-input').value = "";
+            }
+        }
+
+        // Allow pressing Enter key on input screen
+        document.getElementById('password-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') unlockWebsite();
+        });
+
+        // 2. Audio Control Panel
+        const audioEl = document.getElementById('birthday-audio');
+        const musicIcon = document.getElementById('music-icon');
+
+        function toggleMusic() {
+            if (audioEl.paused) {
+                audioEl.play();
+                musicIcon.className = "fa-solid fa-pause";
+            } else {
+                audioEl.pause();
+                musicIcon.className = "fa-solid fa-play";
+            }
+        }
+
+        function changeVolume(val) {
+            audioEl.volume = val;
+        }
+
+        // 3. Initialize Website Features upon Successful Password Match
+        function initWebsiteEffects() {
+            createFloatingParticles();
+            setupScrollAnimations();
+            startCountdown();
+            setupGrandFinaleConfetti();
+        }
+
+        // 4. Floating Particles Engine
+        function createFloatingParticles() {
+            const container = document.getElementById('particle-container');
+            const particleIcons = ['fa-heart', 'fa-sparkles', 'fa-star'];
+            const colors = ['text-pink-200', 'text-amber-200', 'text-rose-200', 'text-white'];
+            
+            setInterval(() => {
+                const particle = document.createElement('div');
+                const randomIcon = particleIcons[Math.floor(Math.random() * particleIcons.length)];
+                const randomColor = colors[Math.floor(Math.random() * colors.length)];
+                
+                particle.className = `particle fa-solid ${randomIcon} ${randomColor}`;
+                particle.style.left = Math.random() * 100 + 'vw';
+                particle.style.top = (window.scrollY + window.innerHeight) + 'px';
+                particle.style.fontSize = (Math.random() * 14 + 10) + 'px';
+                particle.style.animationDuration = (Math.random() * 4 + 6) + 's';
+                
+                container.appendChild(particle);
+                
+                // Clear DOM memory leak paths
+                setTimeout(() => { particle.remove(); }, 8000);
+            }, 350);
+        }
+
+        // 5. Lightbox Engine for Custom Photos
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-img');
+
+        function openLightbox(src) {
+            lightboxImg.src = src;
+            lightbox.classList.remove('hidden');
+            lightbox.classList.add('flex');
+            setTimeout(() => {
+                lightbox.classList.add('opacity-100');
+                lightboxImg.classList.remove('scale-95');
+            }, 20);
+        }
+
+        function closeLightbox() {
+            lightbox.classList.remove('opacity-100');
+            lightboxImg.classList.add('scale-95');
+            setTimeout(() => {
+                lightbox.classList.remove('flex');
+                lightbox.classList.add('hidden');
+            }, 300);
+        }
+
+        // 6. Smooth Scroll Reveal Logic
+        function setupScrollAnimations() {
+            const reveals = document.querySelectorAll('.reveal');
+            
+            const observerOptions = {
+                root: null,
+                threshold: 0.1,
+                rootMargin: "0px 0px -50px 0px"
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                    }
+                });
+            }, observerOptions);
+
+            reveals.forEach(reveal => observer.observe(reveal));
+        }
+
+        // 7. Live Countdown Dynamic Module
+        function startCountdown() {
+            function updateTimer() {
+                const now = new Date().getTime();
+                const distance = COUNTDOWN_DATE - now;
+
+                if (distance < 0) {
+                    document.getElementById("days").innerText = "00";
+                    document.getElementById("hours").innerText = "00";
+                    document.getElementById("minutes").innerText = "00";
+                    document.getElementById("seconds").innerText = "00";
+                    return;
+                }
+
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                document.getElementById("days").innerText = days < 10 ? "0" + days : days;
+                document.getElementById("hours").innerText = hours < 10 ? "0" + hours : hours;
+                document.getElementById("minutes").innerText = minutes < 10 ? "0" + minutes : minutes;
+                document.getElementById("seconds").innerText = seconds < 10 ? "0" + seconds : seconds;
+            }
+            setInterval(updateTimer, 1000);
+            updateTimer();
+        }
+
+        // 8. Auto Grand Finale Confetti Burst
+        function setupGrandFinaleConfetti() {
+            const finalSection = document.getElementById('final-appreciation');
+            let burstTriggered = false;
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if(entry.isIntersecting && !burstTriggered) {
+                        triggerConfetti();
+                        burstTriggered = true; // Burst perfectly once on scroll reveal
+                    }
+                });
+            }, { threshold: 0.4 });
+
+            observer.observe(finalSection);
+        }
+
+        function triggerConfetti() {
+            const duration = 3 * 1000;
+            const end = Date.now() + duration;
+
+            (function frame() {
+                confetti({
+                    particleCount: 3,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0, y: 0.8 },
+                    colors: ['#f43f5e', '#ec4899', '#fbbf24', '#fff']
+                });
+                confetti({
+                    particleCount: 3,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1, y: 0.8 },
+                    colors: ['#f43f5e', '#ec4899', '#fbbf24', '#fff']
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            }());
+        }
+    </script>
+</body>
+</html>
